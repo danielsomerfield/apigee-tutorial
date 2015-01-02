@@ -354,3 +354,9 @@ footer p + p {
     content: 'at http://github.com/';
   }
 }
+
+/** Custom for this site **/
+.source-code-comment {
+  font-style: italic;
+  margin-bottom: 12px;
+}
