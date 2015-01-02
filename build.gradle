@@ -6,12 +6,6 @@ version = '1.0'
 
 mainClassName = "helloService.HelloServiceMain"
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
-
 repositories {
     mavenCentral()
 }
@@ -30,4 +24,8 @@ test {
 
 task uat (type: Test, dependsOn:'test') {
     include '**/*UATest.*'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
 }
