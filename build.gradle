@@ -1,0 +1,25 @@
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+mainClassName = "helloService.HelloServiceMain"
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.+'
+    compile 'org.eclipse.jetty:jetty-http:8.1.+'
+    compile 'org.eclipse.jetty:jetty-server:8.1.+'
+    testCompile 'org.apache.httpcomponents:httpclient:4.3.+'
+    testCompile 'junit:junit:4.+'
+}
