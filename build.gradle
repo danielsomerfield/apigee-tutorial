@@ -23,3 +23,15 @@ dependencies {
     testCompile 'org.apache.httpcomponents:httpclient:4.3.+'
     testCompile 'junit:junit:4.+'
 }
+
+test {
+    exclude '**/*UATest.*'
+}
+
+task uat (type: Test, dependsOn:'test') {
+    doFirst {
+
+    }
+
+    include '**/*UATest.*'
+}
