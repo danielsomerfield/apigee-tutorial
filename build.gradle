@@ -29,9 +29,5 @@ test {
 }
 
 task uat (type: Test, dependsOn:'test') {
-    doFirst {
-
-    }
-
     include '**/*UATest.*'
 }
