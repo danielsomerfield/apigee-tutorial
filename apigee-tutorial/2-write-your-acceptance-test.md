@@ -3,6 +3,8 @@ title: Write Your Acceptance Tests
 layout: tutorial
 tag: write-your-service
 ---
+In the [first section](1-setup-build-scripts.html), we set up our preliminary build environment. Now we move on to code.
+
 I think there is value in codifying the desired result of this tutorial into an acceptance test. It keeps us honestly. It provides a mechanism for regression testing. If you are a BDD or TDD person, you don't need to be convinced, but if you're not, well, you're not. In that case, just be happy that while you go through the tutorial you have these tests to make sure you have everything set up right.
 
 If I was going to be really ambitious I would set up the project to run cucumber tests for the User Acceptance tests, but in this case, it would just complicate the project, so I'm just going to use vanilla junit tests written in groovy.
@@ -76,7 +78,7 @@ class HttpUtils {
   }
 
   def static pathToURL(String path){
-    String urlRoot = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
+    String urlRoot = System.getProperty("helloService.url.root") ?: "http://localhost:8080"
     return "$urlRoot$path"
   }
 }
@@ -131,4 +133,4 @@ at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:195)
 {% endhighlight %}
 Again, not terribly surprising since we didn't actually write any code to handle the connection. And so we will...
 
-## [Continue to "Section 3: Write Your Service"](2-write-your-service.html) ##
+## [Continue to "Section 3: Write Your Service"](3-write-your-service.html) ##
