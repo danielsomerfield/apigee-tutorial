@@ -80,5 +80,55 @@ class HttpUtils {
     return "$urlRoot$path"
   }
 }
-
 {% endhighlight %}
+
+We'll use this class again and possibly refactor it a bit on the way. The important thing to observe is that the pathToURL function allows overrides so we can run the tests against another target if we choose to do so.
+
+If you run the acceptance test target, you will see something like this:
+
+{% highlight bash %}
+╰─➤  ./gradlew uat
+:compileJava UP-TO-DATE
+:compileGroovy UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:compileTestJava UP-TO-DATE
+:compileTestGroovy UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test
+:uat
+
+helloService.HelloServiceUATest > testHelloServiceEndpoint FAILED
+org.apache.http.conn.HttpHostConnectException at HelloServiceUATest.groovy:11
+Caused by: java.net.ConnectException at HelloServiceUATest.groovy:11
+
+1 test completed, 1 failed
+:uat FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':uat'.
+> There were failing tests. See the report at: file:apigee_tutorial/build/reports/tests/index.html
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+{% endhighlight %}
+
+And, if we look at the provided fail path, it will contain details, including a stacktrace:
+
+{% highlight bash %}
+org.apache.http.conn.HttpHostConnectException: Connect to localhost:8080 [localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1] failed: Connection refused
+at org.apache.http.impl.conn.HttpClientConnectionOperator.connect(HttpClientConnectionOperator.java:142)
+at org.apache.http.impl.conn.PoolingHttpClientConnectionManager.connect(PoolingHttpClientConnectionManager.java:319)
+at org.apache.http.impl.execchain.MainClientExec.establishRoute(MainClientExec.java:363)
+at org.apache.http.impl.execchain.MainClientExec.execute(MainClientExec.java:219)
+at org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:195)
+...
+{% endhighlight %}
+Again, not terribly surprising since we didn't actually write any code to handle the connection. And so we will...
+
+## [Continue to "Section 3: Write Your Service"](2-write-your-service.html) ##
