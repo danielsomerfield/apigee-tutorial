@@ -31,11 +31,6 @@ So how does that look like in code?
 {% highlight groovy %}
 package helloService
 
-import org.junit.Test
-
-import static helloService.HttpUtils.doGetRequest
-import static org.junit.Assert.assertEquals
-
 class HelloServiceUATest {
   @Test
   def void testHelloServiceEndpoint() {
@@ -47,18 +42,13 @@ class HelloServiceUATest {
   }
 }
 {% endhighlight %}
+[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/write-your-service/src/test/groovy/helloService/HelloServiceTest.groovy)
 
 Again, pretty standard stuff. A lot of the heavy lifting occurs in the HttpUtils class, shown below. The test itself is extremely simple: assert that, given the input we can make the HTTP request and receive the expected output. The only thing that might look a bit odd is the ".message" call on the result of jsonResult. This is some groovy JSON / dynamic binding magic. The JSON library returns a map representing the JSON. Groovy turns ".message" into a call to Map.get() call. It allows
 
 The utility class, for the sake of completeness, is as follows:
 {% highlight groovy %}
 package helloService
-
-import groovy.json.JsonSlurper
-import org.apache.http.client.methods.CloseableHttpResponse
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.client.methods.HttpUriRequest
-import org.apache.http.impl.client.HttpClients
 
 class HttpUtils {
 
@@ -78,11 +68,12 @@ class HttpUtils {
   }
 
   def static pathToURL(String path){
-    String urlRoot = System.getProperty("helloService.url.root") ?: "http://localhost:8080"
+    String urlRoot = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
     return "$urlRoot$path"
   }
 }
 {% endhighlight %}
+[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/write-your-service/src/test/groovy/helloService/HttpUtils.groovy)
 
 We'll use this class again and possibly refactor it a bit on the way. The important thing to observe is that the pathToURL function allows overrides so we can run the tests against another target if we choose to do so.
 

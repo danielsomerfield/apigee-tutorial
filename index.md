@@ -3,8 +3,7 @@ title: About this tutorial
 layout: default
 ---
 
-The goal of this tutorial is to write a basic web service (a hello world variant, of course) using a continuous delivery pipeline,
-with code and configuration living in github (or an equivalent SCM).
+The goal of this tutorial is to write a basic web service (a hello world variant, of course) using a continuous delivery pipeline, with code and configuration living in github (or an equivalent SCM).
 
 ### Project goals
 - SSL-only: at no point in the call chain should a request be allowed over non-SSL
@@ -27,7 +26,7 @@ info (AFAIK) that will not be part of my source tree
 - You have an existing heroku account
 - You have an existing apigee account
 
-  A note on apigee accounts: apigee offers several services. Make sure you have the API Management service. You can sign up for
+  *A note on apigee accounts: apigee offers several services. Make sure you have the API Management service. You can sign up for
 the free Developer unlimited trial. While it isn't enough for an enterprise deployment, it should provide you with
 what you need for this tutorial.*
 - You have an existing SnapCI account
@@ -36,3 +35,5 @@ comfortable enough to understand the provided code
 
 The repo for the code is available on [GitHub](https://github.com/danielsomerfield/apigee-tutorial.git).
 Along the way, tags will be listed in case you want to see the code in the state for the current step. At times, a single tag will serve for several tutorial steps.
+
+**[Start the tutorial!](/apigee-tutorial/1-setup-build-scripts.html)**

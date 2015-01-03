@@ -28,7 +28,6 @@ I won't go into any great detail on the gradle wrapper classes. If you want to l
 The most interesting file is the build.gradle:
 {% highlight groovy %}
 apply plugin: 'groovy'
-apply plugin: 'application'
 
 sourceCompatibility = 1.8
 version = '1.0'
@@ -53,11 +52,13 @@ task wrapper(type: Wrapper) {
   gradleVersion = '2.1'
 }
 {% endhighlight %}
+*[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/write-your-service/build.gradle)*
 
-It's all pretty standard gradle stuff exception:
+It's all pretty standard gradle stuff except:
 
 - I have overridden the test task to exclude everything with "UATest" in the class name.
 - There is a custom task "uat" which will run only test classes with "UATest" in the name.
+- I have included the "wrapper" task which initializes the gradle wrapper. Once that is checked in, it's arguable with this task is necessary anymore, but I left it in for posterity.
 
 The purpose here is so that we can run our unit tests (via ./gradlew test) and our user acceptance tests (via ./gradlew uat) separately. You can do that now although the results will be less than thrilling since we don't have any code at this point.
 
