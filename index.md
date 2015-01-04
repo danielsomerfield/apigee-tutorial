@@ -30,8 +30,8 @@ info (AFAIK) that will not be part of my source tree
 the free Developer unlimited trial. While it isn't enough for an enterprise deployment, it should provide you with
 what you need for this tutorial.*
 - You have an existing SnapCI account
-- You have some level of knowledge of gradle and groovy. You don't have to be an expert (I'm not), but you are at least
-comfortable enough to understand the provided code
+- You have some level of knowledge of gradle and groovy. You don't have to be an expert (I'm not), but you are at least comfortable enough to understand the provided code
+- You have Java 8 installed and on your path
 
 The repo for the code is available on [GitHub](https://github.com/danielsomerfield/apigee-tutorial.git).
 Along the way, tags will be listed in case you want to see the code in the state for the current step. At times, a single tag will serve for several tutorial steps.

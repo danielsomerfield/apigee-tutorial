@@ -3,7 +3,7 @@ title: Write Your Service
 layout: tutorial
 tag: write-your-service-2
 ---
-We've set up the gradle project in [section 1](1-setup-build-scripts.html) and written an acceptance test in [section 2](2-write-your-acceptance-test.html). Now we being implementation.
+We've set up the gradle project in [section 1](1-setup-build-scripts.html) and written an acceptance test in [section 2](2-write-your-acceptance-test.html). Now we begin implementation.
 
 Honestly, I did this part in a couple of steps. First I did a first cut with everything crammed into the main class but it left some rather difficult to test code, so I broke it into a three concerns: the main runtime entry point, the web request/response handling code, and the actual service logic. This makes the code considerably more testable--it seems a little overkill with a service that does so little, but now I can easily write unit tests for my business logic.
 

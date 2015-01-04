@@ -357,6 +357,11 @@ footer p + p {
 
 /** Custom for this site **/
 .source-code-comment {
+  margin-top: -15px;
   font-style: italic;
   margin-bottom: 12px;
+  color: #BBBBBB;
+  text-align: right;
+  width: 100%;
+  margin-bottom: 15px;
 }

@@ -1,1 +1,4 @@
+- TOC
+- Change from "we" to "I"
 - Write a section to improve the tests and the code by adding non-happy path cases like null names and incorrect content types, etc
+- Write section on making tests run in parallel?? Maybe?
