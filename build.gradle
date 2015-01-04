@@ -1,11 +1,22 @@
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.impl.client.HttpClients
+
 apply plugin: 'groovy'
 apply plugin: 'application'
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.apache.httpcomponents:httpclient:4.3.6'
+    }
+}
+
 sourceCompatibility = 1.8
 version = '1.0'
-
 mainClassName = "helloService.HelloServiceMain"
-
 repositories {
     mavenCentral()
 }
@@ -22,8 +33,77 @@ test {
     exclude '**/*UATest.*'
 }
 
-task uat (type: Test, dependsOn:'test') {
+task uat(type: Test, dependsOn: ['test', 'jar', 'copyDeps']) {
     include '**/*UATest.*'
+    doFirst {
+        startApp()
+        waitForPing()
+    }
+}
+uat.finalizedBy("cleanup")
+
+task cleanup() {
+    doFirst {
+        stopApp()
+    }
+}
+
+task copyDeps(type: Copy) {
+    configurations.runtime.collect {
+        from it
+    }
+
+    into { "build/libs" }
+}
+
+def stopApp() {
+    if (ext.process != null) {
+        logger.info("Killing the app")
+        ext.process.destroy()
+    }
+}
+
+def startApp() {
+    logger.info("Starting the app")
+    ProcessBuilder builder = new ProcessBuilder("java", "-classpath", "build/libs/*", mainClassName);
+    builder.inheritIO()
+    ext.process = builder.start()
+}
+
+def waitForPing() {
+    def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
+    waitUntil(5000) {
+        if (!ext.process.isAlive()) {
+            throw new GradleException("The server process died with return code ${ext.process.exitValue()}")
+        }
+        ping("$url/ping/")
+    }
+}
+
+def ping(String url) {
+    try {
+        HttpGet get = new HttpGet(url)
+        HttpClients.createDefault().withCloseable() { client ->
+            client.execute(get).withCloseable() { response ->
+                return response.statusLine.statusCode == 200
+            }
+        }
+    }
+    catch (IOException ignored) {
+        return false;
+    }
+}
+
+def waitUntil(long maxWait, Closure closure) {
+    long timeout = System.currentTimeMillis() + maxWait;
+
+    while (System.currentTimeMillis() < timeout) {
+        if (closure() == true) {
+            return
+        }
+        Thread.sleep(500)
+    }
+    throw new GradleException("Wait for expected condition timed out.")
 }
 
 task wrapper(type: Wrapper) {

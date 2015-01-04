@@ -1,6 +1,7 @@
 package helloService
 
 import groovy.json.JsonBuilder
+import org.eclipse.jetty.server.Handler
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.handler.AbstractHandler
@@ -23,10 +24,15 @@ class HelloServer {
 
     def HandlerCollection getHandlers() {
         HandlerCollection collection = new HandlerCollection();
-        ContextHandler context = new ContextHandler("/hello")
-        context.setHandler(createHelloHandler())
-        collection.addHandler(context)
+        addHandlerWithContext(collection, "/hello", createHelloHandler())
+        addHandlerWithContext(collection, "/ping", createPingHandler());
         return collection;
+    }
+
+    def static addHandlerWithContext(HandlerCollection collection, String context, Handler handler) {
+        ContextHandler contextHandler = new ContextHandler(context)
+        contextHandler.setHandler(handler)
+        collection.addHandler(contextHandler)
     }
 
     def createHelloHandler() {
@@ -37,6 +43,15 @@ class HelloServer {
             response.getWriter().withCloseable { writer ->
                 writer.println(buildJSON(request.getParameter("name")))
             }
+            baseRequest.setHandled(true)
+        } as AbstractHandler
+    }
+
+    def static createPingHandler() {
+        { final String target, Request baseRequest,
+          final HttpServletRequest request,
+          final HttpServletResponse response ->
+            response.setContentType("application/json")
             baseRequest.setHandled(true)
         } as AbstractHandler
     }
