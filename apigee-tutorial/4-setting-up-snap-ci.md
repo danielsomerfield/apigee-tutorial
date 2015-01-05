@@ -36,11 +36,11 @@ But we don't and so we're going to build it. In short what I am want to do is th
 - Whether they pass or fail, kill the app
 
 #### Launching and Tearing Down
-Unfortunately gradle doesn't give much to do an async application launch, but it gives enough information that we can do it ourselves with Java's `ProcessBuilder` class. To do the teardown, we can create a task that will run after the UAT, whether it passes or fails. Gradle gives us `finalizedBy` for this purpose.
+Unfortunately gradle doesn't give much to do an async application launch, but it gives enough information that we can do it ourselves with Java's `ProcessBuilder` class and the scripts that gradle generates for us. To do the teardown, we can create a task that will run after the UAT, whether it passes or fails. Gradle gives us `finalizedBy` for this purpose.
 
 {% highlight groovy %}
 ...
-task uat(type: Test, dependsOn: ['test', 'jar', 'copyDeps']) {
+task uat(type: Test, dependsOn: ['test', 'copyDeps']) {
   include '**/*UATest.*'
   doFirst {
     startApp()
@@ -54,12 +54,9 @@ task cleanup() {
   }
 }
 
-task copyDeps(type: Copy) {
-  configurations.runtime.collect {
-    from it
-  }
-
-  into { "build/libs" }
+task extractDistro(type:Copy, dependsOn: 'distZip') {
+  from(zipTree("build/distributions/${project.name}-${project.version}.zip"))
+  into 'build/exploded'
 }
 
 def stopApp() {
@@ -71,8 +68,7 @@ def stopApp() {
 
 def startApp() {
   logger.info("Starting the app")
-  ProcessBuilder builder = new ProcessBuilder("java", "-classpath",
-    "build/libs/*", mainClassName);
+  ProcessBuilder builder = new ProcessBuilder("build/exploded/${project.name}-${project.version}/bin/${project.name}")
   builder.inheritIO()
   ext.process = builder.start()
 }
@@ -80,9 +76,7 @@ def startApp() {
 {% endhighlight %}
 *[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/setup-snap-ci/build.gradle)*
 
-Now the app will start on its own before running the tests. And when it's done, it will be killed. The added dependency on `jar`, and `copyDeps` to the `uat` task ensure that both the app and all its dependencies are available for launching. The `copyDeps()` function isn't terribly hard to write because gradle keeps track of the runtime dependencies for us.
-
-Incidentally, another way to do this would be to call the `distZip` task to build the entire distribution, then extract and run against it. Either way works. Arguably, the latter approach is better from a continuous delivery prospective assuming we are going to be considering that zip the final product. We'll see later on, however that because we are using Heroku, we're going to have to make some compromises on that front anyway.
+Now the app will start on its own before running the tests. And when it's done, it will be killed. The added dependency on `jar`, and `extractDistro` to the `uat` task ensure that both the app and all its dependencies are available for launching. The `extractDistro` simply tears open the distribution zip that is created by the `distZip` target we call implicitly by making it a dependency. It seems like a lot of overhead to create zip, then tear it open, but we're going to use that later. That zip is going to be come our final tested and deployed artifact.
 
 So here's the thing. If you run the `uat` task now, it *might* work. The app will start, but because it is starting asynchronously, it might or might not be completely started by the time the tests run. Most likely that will mean flakey test runs. We could add a big fat delay at the beginning, but that feels unpredictable, so I am going to add a feature that will block the test run until I believe the application is alive and run the tests at that point. If it isn't up after a certain amount of time, I will assume it crashed and abort the run.
 
@@ -101,7 +95,7 @@ buildscript {
   }
 }
 
-task uat(type: Test, dependsOn: ['test', 'jar', 'copyDeps']) {
+task uat(type: Test, dependsOn: ['test', 'extractDistro']) {
   include '**/*UATest.*'
   doFirst {
     startApp()
@@ -212,7 +206,7 @@ Total time: 6.598 secs
 Hopefully you will see something like the above, meaning all is well.
 
 ### Improving the Pipeline ###
-**Finally** with all that done, we can enhance the pipeline. Back on Snap, we add the uat stage to my pipeline and then run it.
+*Finally* with all that done, we can enhance the pipeline. Back on Snap, we add the uat stage to my pipeline and then run it.
 ![Adding UAT to Snap](../images/tutorial/snap-pipeline-2.png)
 
 Now you are running your UAT in your build pipeline! If you have any doubt, introduce a breaking change and watch the build go red.
