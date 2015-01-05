@@ -33,7 +33,7 @@ test {
     exclude '**/*UATest.*'
 }
 
-task uat(type: Test, dependsOn: ['test', 'jar', 'copyDeps']) {
+task uat(type: Test, dependsOn: ['test', 'extractDistro']) {
     include '**/*UATest.*'
     doFirst {
         startApp()
@@ -48,12 +48,9 @@ task cleanup() {
     }
 }
 
-task copyDeps(type: Copy) {
-    configurations.runtime.collect {
-        from it
-    }
-
-    into { "build/libs" }
+task extractDistro(type:Copy, dependsOn: 'distZip') {
+    from(zipTree("build/distributions/${project.name}-${project.version}.zip"))
+    into 'build/exploded'
 }
 
 def stopApp() {
@@ -65,7 +62,7 @@ def stopApp() {
 
 def startApp() {
     logger.info("Starting the app")
-    ProcessBuilder builder = new ProcessBuilder("java", "-classpath", "build/libs/*", mainClassName);
+    ProcessBuilder builder = new ProcessBuilder("build/exploded/${project.name}-${project.version}/bin/${project.name}")
     builder.inheritIO()
     ext.process = builder.start()
 }
