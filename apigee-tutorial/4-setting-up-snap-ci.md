@@ -3,7 +3,7 @@ title: Setting Up Snap CI
 layout: tutorial
 tag: setup-snap-ci
 ---
-In [the last section](1-setup-build-scripts.html), I finished the basic application, along with tests. Now I want to make sure we have continuous integration in place, so it's obvious if I break something when I refactor and enhance the application.
+In [the last section](1-write-your-service.html), we finished the basic application, along with tests. Now we want to make sure we have continuous integration in place, so it's obvious if I break something when refactoring or enhancing the application.
 
 Some people would recommend setting up a continuous delivery pipeline before writing the first line of code, and I think there is merit in that approach, but from my experience, that isn't how things work. Developers have mucked around locally for a while and then they decide (or are told) to run this through a CI pipeline. If you have written solid tests that run with a simple command, then you won't have to change much to integrate with CI, or even CD.
 
@@ -12,7 +12,7 @@ As I mentioned in the intro, there might be better options out there that would 
 All that said, we are where we are, so let's move it to Snap CI.
 
 ### Basic CI pipeline ###
-First I'll just set up Snap to build and run unit tests. Log into Snap and you should see your list of builds, possibly empty. You can create a new one by clicking `+ Repository`. This will bring up a list of repos from your github account. Choose one, and after a few minutes you will have a bare bones pipeline established. To set up the initial pipeline, do the following
+First we'll just set up Snap to build and run unit tests. Log into Snap and you should see your list of builds, possibly empty. You can create a new one by clicking `+ Repository`. This will bring up a list of repos from your github account. Choose one, and after a few minutes you will have a bare bones pipeline established. To set up the initial pipeline, do the following
 - Make sure that the Java version is set to 1.8
 - Modify the first step in the pipeline to be **Test**
 - Set the commands for the **Test** step to be `./gradlew clean test`
@@ -21,22 +21,22 @@ First I'll just set up Snap to build and run unit tests. Log into Snap and you s
 Once you have saved it, the pipeline will run and it should pass. If it doesn't, you can look at the logs and see why not.
 
 ### A Brief Philosophical Degression ###
-This is all well and good, but it isn't exactly comprehensive. At this point, I really need the automation running the full UAT. In fact, that's the point: if this were more complete application with many UA tests, running the UAT could take a long time. I might not want to have to run it at every check in. If I trust the completeness of my unit and integration tests, then I can run those locally and commit and trust that if I did anything dumb, the UA tests will catch it. At the risk of getting to deep in the philosophy of CI/CD: the point of the pipeline is to have a series of steps of increasing "investment", investment of time, investment of resources. As I progress down that path, my layers of tests assert, in effect, that I am willing to make a greater investment and proceed to the next step, the final step being live code in production (with all caveats about blue/green and canary deployments acknowledged) being used by my customers. Which is why this one step pipeline isn't very useful.
+This is all well and good, but it isn't exactly comprehensive. At this point, we really need the automation running the full UAT. In fact, that's the point: if this were more complete application with many UA tests, running the UAT could take a long time. we might not want to have to run it at every check in. If we trust the completeness of our unit and integration tests, then we can run those locally and commit and trust that if we did anything dumb, the UA tests will catch it. At the risk of getting to deep in the philosophy of CI/CD: the point of the pipeline is to have a series of steps of increasing "investment", investment of time, investment of resources. As we progress down that path, layers of tests assert, in effect, that we am willing to make a greater investment and proceed to the next step, the final step being live code in production (with all caveats about blue/green and canary deployments acknowledged) being used by my customers. Which is why this one step pipeline isn't very useful.
 
 So let's make it better.
 
 ### Improving the UAT Task ###
-In order to run the UAT, we need to make our `uat` task self-contained, so we don't have to have a separate step to spin up the application. In order to do so, I can modify the `doFirst` task to do just that. Admittedly, this is where we pay a bit of a cost for not using a deployable. At this point, if I had a web app, we could do this with the build in jetty task, cargo, or the third party tomcat app.
+In order to run the UAT, we need to make our `uat` task self-contained, so we don't have to have a separate step to spin up the application. In order to do so, we can modify the `doFirst` task to do just that. Admittedly, this is where we pay a bit of a cost for not using a deployable. At this point, if we had a web app, we could do this with the build in jetty task, cargo, or the third party tomcat app.
 
-But I don't and so we're going to build it. In short what I am want to do is this:
+But we don't and so we're going to build it. In short what I am want to do is this:
 
-- Launch my Java app in an external process
+- Launch the Java app in an external process
 - Wait to make sure the app is up
 - Run the tests
 - Whether they pass or fail, kill the app
 
 #### Launching and Tearing Down
-Unfortunately gradle doesn't give much to do an async application launch, but it gives enough information that I can do it myself with Java's `ProcessBuilder` class. To do the teardown, I can create a task that will run after the UAT, whether it passes or fails. Gradle gives us `finalizedBy` for this purpose.
+Unfortunately gradle doesn't give much to do an async application launch, but it gives enough information that we can do it ourselves with Java's `ProcessBuilder` class. To do the teardown, we can create a task that will run after the UAT, whether it passes or fails. Gradle gives us `finalizedBy` for this purpose.
 
 {% highlight groovy %}
 ...
@@ -71,7 +71,8 @@ def stopApp() {
 
 def startApp() {
   logger.info("Starting the app")
-  ProcessBuilder builder = new ProcessBuilder("java", "-classpath", "build/libs/*", mainClassName);
+  ProcessBuilder builder = new ProcessBuilder("java", "-classpath",
+    "build/libs/*", mainClassName);
   builder.inheritIO()
   ext.process = builder.start()
 }
@@ -79,14 +80,14 @@ def startApp() {
 {% endhighlight %}
 *[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/setup-snap-ci/build.gradle)*
 
-Now the app will start on its own before running the tests. And when it's done, it will be killed. I have added a dependency on `jar`, and `copyDeps` to the `uat` task to ensure that both the app, and all its dependencies are available for launching. Writing `copyDeps()` isn't terribly hard because gradle keeps track of the runtime dependencies.
+Now the app will start on its own before running the tests. And when it's done, it will be killed. The added dependency on `jar`, and `copyDeps` to the `uat` task ensure that both the app and all its dependencies are available for launching. The `copyDeps()` function isn't terribly hard to write because gradle keeps track of the runtime dependencies for us.
 
 Incidentally, another way to do this would be to call the `distZip` task to build the entire distribution, then extract and run against it. Either way works. Arguably, the latter approach is better from a continuous delivery prospective assuming we are going to be considering that zip the final product. We'll see later on, however that because we are using Heroku, we're going to have to make some compromises on that front anyway.
 
-So here's the thing. If you run the `uat` task now, it *might* work. The app will start, but because it is starting asynchronously, it might or might not be completely started by the time the tests run. Most likely that will mean flakey test runs. You could add a big fat delay at the beginning, but that feels unpredictable, so I am going to add a feature that will block the rest run until I believe the application is alive and run the tests at that point. If it isn't up after a certain amount of time, I will assume it crashed and abort the run.
+So here's the thing. If you run the `uat` task now, it *might* work. The app will start, but because it is starting asynchronously, it might or might not be completely started by the time the tests run. Most likely that will mean flakey test runs. We could add a big fat delay at the beginning, but that feels unpredictable, so I am going to add a feature that will block the test run until I believe the application is alive and run the tests at that point. If it isn't up after a certain amount of time, I will assume it crashed and abort the run.
 
 #### Waiting for the app to run
-I like services to have health checks, so adding one for this purpose doesn't really feel like extra work. And it's really easy. Then I'm going to *ping* that health check from my build script. The changes to the build will look like this:
+I like services to have health checks, so adding one for this purpose doesn't really feel like extra work. And it's really easy. We're going going to *ping* that health check from the build script. The changes to the build will look like this:
 {% highlight groovy %}
 ...
 
@@ -148,9 +149,9 @@ def waitUntil(long maxWait, Closure closure) {
 {% endhighlight %}
 *[View the full file on GitHub](https://github.com/danielsomerfield/apigee-tutorial/blob/setup-snap-ci/build.gradle)*
 
-First thing I needed was to add a `buildscript` section. This allows me to add repos and dependencies to the build script itself. Since I am going to use the Apache HTTP client libraries, that is what I add to the classpath. I add the wait to the `doFirst` closure of the UAT task so that it blocks until the ping has been successful. The wait itself is simply a matter of running an HTTP GET until either a 200 code is returned or 5000 milliseconds has passed. Pretty simply stuff. Admittedly, the build script is starting to get a little ugly, so I could move the utility functions into an external plugin, or into the buildSrc directory of my tree, but for now, I'll leave it where it is and move them out if I need them somewhere else.
+First we add a `buildscript` section. This allows us to add repos and dependencies to the build script itself. Since we are going to use the Apache HTTP client libraries, that is what we want add to the classpath. We add the wait to the `doFirst` closure of the UAT task so that it blocks until the ping has been successful. The wait itself is simply a matter of running an HTTP GET until either a 200 code is returned or 5000 milliseconds has passed. Pretty simply stuff. Admittedly, the build script is starting to get a little ugly, so we could move the utility functions into an external plugin, or into the buildSrc directory of the tree, but for now, we'll leave it where it is and move them out if we need them somewhere else or the mess becomes unbearable.
 
-If you run `./gradlew uat` at this point, it will fail with the message *"Wait for expected condition timed out."* I need to write the endpoint that responds to the ping. In doing that, I'll do a little refactoring on the way. I have good tests I can run--the old way if necessary--to make sure I don't break anything, so it's worth the investment.
+If you run `./gradlew uat` at this point, it will fail with the message *"Wait for expected condition timed out."* We need to write the endpoint that responds to the ping. In doing that, We'll do a little refactoring on the way. We have good tests we can run--the old way if necessary--to make sure we don't break anything, so it's worth the investment.
 
 {% highlight groovy %}
 ...
@@ -211,11 +212,11 @@ Total time: 6.598 secs
 Hopefully you will see something like the above, meaning all is well.
 
 ### Improving the Pipeline ###
-**Finally** with all that done, I can fix the pipeline. Back on Snap, I add the uat stage to my pipeline and then run it.
-![Initial Snap CI Pipeline](../images/tutorial/snap-pipeline-1.png)
+**Finally** with all that done, we can enhance the pipeline. Back on Snap, we add the uat stage to my pipeline and then run it.
+![Adding UAT to Snap](../images/tutorial/snap-pipeline-2.png)
 
 Now you are running your UAT in your build pipeline! If you have any doubt, introduce a breaking change and watch the build go red.
 
-It's to to move from continuous integration to continuous delivery. In the next section, we push the app to our deployment target.
+It's time to move from continuous integration to continuous delivery. In the next section, we push the app to our deployment target.
 
 ## [Continue to "Section 5: Automated Deployment"](5-automated-deployment.html) ##

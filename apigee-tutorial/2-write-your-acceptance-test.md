@@ -5,14 +5,15 @@ tag: write-your-service
 ---
 In the [first section](1-setup-build-scripts.html), we set up our preliminary build environment. Now we move on to code.
 
-I think there is value in codifying the desired result of this tutorial into an acceptance test. It keeps us honestly. It provides a mechanism for regression testing. If you are a BDD or TDD person, you don't need to be convinced, but if you're not, well, you're not. In that case, just be happy that while you go through the tutorial you have these tests to make sure you have everything set up right.
+I think there is value in codifying the desired result of this tutorial into an acceptance test. It keeps us honest. It provides a mechanism for regression testing. If you are a BDD or TDD person, you don't need to be convinced, but if you're not, well, you're not. In that case, just be happy that while you go through the tutorial you have these tests to make sure you have everything set up right.
 
-If I was going to be really ambitious I would set up the project to run cucumber tests for the User Acceptance tests, but in this case, it would just complicate the project, so I'm just going to use vanilla junit tests written in groovy.
+If I was going to be really ambitious I would set up the project to run cucumber tests for the user acceptance tests, but in this case, it would just complicate the project, so I'm just going to use vanilla junit tests written in groovy.
 
 Our first acceptance tests will simply verify that our service is up and running and responding as expected. I'm going to look ahead a little bit to our forthcoming Continuous Integration scenario and write the tests so they run either locally or in a pipeline.
 
 #### Testing Requirements ####
 So let's start with the application requirements:
+
 As a user of this system, I would like to be able to send an GET request to /hello endpoint with a name parameter and get back a friendly message in a JSON payload as follows:
 
 ***Input***

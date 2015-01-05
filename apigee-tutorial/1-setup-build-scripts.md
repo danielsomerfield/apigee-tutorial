@@ -3,7 +3,7 @@ title: Setting Up Build Scripts
 layout: tutorial
 tag: write-your-service
 ---
-First thing, before we write any code, is to set up the build environment so we can build, test and deploy the code on our local machine in an automation fashion. I have chosen to use gradle because:
+First thing, before writing any code, is to set up the build environment so we can build, test and deploy the code on a local machine in an automation fashion. I have chosen to use gradle because:
 
 - it's fairly easy to use out of the box
 - it's becoming a more and more common platform for this kind of product
@@ -23,7 +23,7 @@ gradlew.bat
 settings.gradle
 {% endhighlight %}
 
-I won't go into any great detail on the gradle wrapper classes. If you want to learn more about those, and why they are there, please read up on gradle on the [gradle docs pages](http://www.gradle.org/docs/current/userguide/gradle_wrapper.html). Suffice it to say that for a continuous integration project, we are better having the build resources within our project than counting on what exists on the file system.
+I won't go into any great detail on the gradle wrapper classes. If you want to learn more about those, and why they are there, please read up on gradle on the [gradle docs pages](http://www.gradle.org/docs/current/userguide/gradle_wrapper.html). Suffice it to say that for a continuous integration project, it's better to have the the build resources within the project than counting on what exists on the file system of the machine running the build.
 
 The most interesting file is the build.gradle:
 {% highlight groovy %}
@@ -60,7 +60,7 @@ It's all pretty standard gradle stuff except:
 - There is a custom task "uat" which will run only test classes with "UATest" in the name.
 - I have included the "wrapper" task which initializes the gradle wrapper. Once that is checked in, it's arguable with this task is necessary anymore, but I left it in for posterity.
 
-The purpose here is so that we can run our unit tests (via ./gradlew test) and our user acceptance tests (via ./gradlew uat) separately. You can do that now although the results will be less than thrilling since we don't have any code at this point.
+I have added the additional `uat` target so I can run unit tests (via `./gradlew test`) and user acceptance tests (via `./gradlew uat`) separately. If we run the tests now, it will work but the results will be less than thrilling since there isn't any code at this point.
 
 Speaking of which, as good TDD developers, the next thing we're going to do is write a test that exercises our first use case.
 
