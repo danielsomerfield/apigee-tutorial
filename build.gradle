@@ -3,6 +3,9 @@ import org.apache.http.impl.client.HttpClients
 
 apply plugin: 'groovy'
 apply plugin: 'application'
+apply plugin: 'maven-publish'
+
+group = "com.danielsomerfield"
 
 buildscript {
     repositories {
@@ -14,9 +17,16 @@ buildscript {
     }
 }
 
-sourceCompatibility = 1.8
-version = '1.0'
 mainClassName = "helloService.HelloServiceMain"
+sourceCompatibility = 1.8
+version = generateVersion()
+
+def generateVersion() {
+    def versionNumber = '1.0.0'
+    def buildName = System.getenv("CI") == 'true' ? System.getenv("SNAP_PIPELINE_COUNTER") : "DEV"
+    project.version = "$versionNumber-$buildName"
+}
+
 repositories {
     mavenCentral()
 }
@@ -48,8 +58,10 @@ task cleanup() {
     }
 }
 
+def distroPath = "build/distributions/${project.name}-${project.version}.zip"
+
 task extractDistro(type:Copy, dependsOn: 'distZip') {
-    from(zipTree("build/distributions/${project.name}-${project.version}.zip"))
+    from(zipTree(distroPath))
     into 'build/exploded'
 }
 
@@ -106,3 +118,23 @@ def waitUntil(long maxWait, Closure closure) {
 task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact (distroPath)
+        }
+    }
+
+    repositories {
+        maven {
+            url "https://api.bintray.com/maven/danielsomerfield/maven/apigee-tutorial"
+            credentials {
+                username = System.getProperty("BINTRAY_USERNAME")
+                password = System.getProperty("BINTRAY_PASSWORD")
+            }
+        }
+    }
+}
+
+//Stage task that downloads the zip file and extracts it
