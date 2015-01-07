@@ -2,7 +2,7 @@ apply plugin: 'groovy'
 
 repositories {
     maven {
-        url "http://dl.bintray.com/danielsomerfield/maven/"
+        url "http://dl.bintray.com/danielsomerfield/maven"
     }
 }
 
@@ -10,7 +10,7 @@ dependencies {
     runtime 'com.danielsomerfield:apigee_tutorial:+'
 }
 
-task deploy << {
+task deploy(type: Copy) {
     configurations.runtime.collect {
         from it
     }

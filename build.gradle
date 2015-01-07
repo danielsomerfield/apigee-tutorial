@@ -1,4 +1,12 @@
-import static BuildUtils.*
+import org.apache.http.auth.AuthScope
+import org.apache.http.auth.UsernamePasswordCredentials
+import org.apache.http.client.CredentialsProvider
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.http.impl.client.HttpClients
+
+import static BuildUtils.ping
+import static BuildUtils.waitUntil
 
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -59,7 +67,7 @@ task cleanup() {
 
 def distroPath = "build/distributions/${project.name}-${project.version}.zip"
 
-task extractDistro(type:Copy, dependsOn: 'distZip') {
+task extractDistro(type: Copy, dependsOn: 'distZip') {
     from(zipTree(distroPath))
     into 'build/exploded'
 }
@@ -95,7 +103,7 @@ task wrapper(type: Wrapper) {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact (distroPath)
+            artifact(distroPath)
         }
     }
 
@@ -105,6 +113,31 @@ publishing {
             credentials {
                 username = System.getenv("BINTRAY_USERNAME")
                 password = System.getenv("BINTRAY_PASSWORD")
+            }
+        }
+    }
+}
+
+publish {
+    doLast {
+        def bintrayPublishURL = "https://api.bintray.com/content/danielsomerfield/maven/apigee-tutorial/${version}/publish"
+
+        println("bintraryURL = $bintrayPublishURL")
+        HttpPost post = new HttpPost(bintrayPublishURL)
+        CredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(
+                new AuthScope(null, -1),
+                new UsernamePasswordCredentials(
+                        System.getenv("BINTRAY_USERNAME"),
+                        System.getenv("BINTRAY_PASSWORD")
+                )
+        );
+
+        HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build().withCloseable { client ->
+            client.execute(post).withCloseable() { response ->
+                if (response.statusLine.statusCode != 200) {
+                    throw new GradleException("Bintray publish receive status code ${response.statusLine.statusCode}.")
+                }
             }
         }
     }
