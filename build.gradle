@@ -103,8 +103,8 @@ publishing {
         maven {
             url "https://api.bintray.com/maven/danielsomerfield/maven/apigee-tutorial?publish=1"
             credentials {
-                username = System.getProperty("BINTRAY_USERNAME")
-                password = System.getProperty("BINTRAY_PASSWORD")
+                username = System.getenv("BINTRAY_USERNAME")
+                password = System.getenv("BINTRAY_PASSWORD")
             }
         }
     }
