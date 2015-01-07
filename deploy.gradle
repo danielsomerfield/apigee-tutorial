@@ -1,0 +1,17 @@
+repositories {
+    maven {
+        url "https://bintray.com/artifact/download/danielsomerfield/maven/"
+    }
+}
+
+dependencies {
+    runtime 'com.danielsomerfield:apigee_tutorial:+'
+}
+
+task deploy << {
+    configurations.runtime.collect {
+        from it
+    }
+
+    into {"build/deploy"}
+}

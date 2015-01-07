@@ -1,5 +1,4 @@
-import org.apache.http.client.methods.HttpGet
-import org.apache.http.impl.client.HttpClients
+import static BuildUtils.*
 
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -89,32 +88,6 @@ def waitForPing() {
     }
 }
 
-def ping(String url) {
-    try {
-        HttpGet get = new HttpGet(url)
-        HttpClients.createDefault().withCloseable() { client ->
-            client.execute(get).withCloseable() { response ->
-                return response.statusLine.statusCode == 200
-            }
-        }
-    }
-    catch (IOException ignored) {
-        return false;
-    }
-}
-
-def waitUntil(long maxWait, Closure closure) {
-    long timeout = System.currentTimeMillis() + maxWait;
-
-    while (System.currentTimeMillis() < timeout) {
-        if (closure() == true) {
-            return
-        }
-        Thread.sleep(500)
-    }
-    throw new GradleException("Wait for expected condition timed out.")
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.1'
 }
@@ -128,7 +101,7 @@ publishing {
 
     repositories {
         maven {
-            url "https://api.bintray.com/maven/danielsomerfield/maven/apigee-tutorial"
+            url "https://api.bintray.com/maven/danielsomerfield/maven/apigee-tutorial?publish=1"
             credentials {
                 username = System.getProperty("BINTRAY_USERNAME")
                 password = System.getProperty("BINTRAY_PASSWORD")
@@ -136,5 +109,3 @@ publishing {
         }
     }
 }
-
-//Stage task that downloads the zip file and extracts it
