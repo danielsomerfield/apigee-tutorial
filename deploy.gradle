@@ -1,6 +1,8 @@
+apply plugin: 'groovy'
+
 repositories {
     maven {
-        url "https://bintray.com/artifact/download/danielsomerfield/maven/"
+        url "http://dl.bintray.com/danielsomerfield/maven/"
     }
 }
 
