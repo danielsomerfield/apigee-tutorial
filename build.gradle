@@ -122,7 +122,6 @@ publish {
     doLast {
         def bintrayPublishURL = "https://api.bintray.com/content/danielsomerfield/maven/apigee-tutorial/${version}/publish"
 
-        println("bintraryURL = $bintrayPublishURL")
         HttpPost post = new HttpPost(bintrayPublishURL)
         CredentialsProvider credsProvider = new BasicCredentialsProvider();
         credsProvider.setCredentials(
