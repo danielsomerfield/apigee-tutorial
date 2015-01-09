@@ -65,6 +65,16 @@ task cleanup() {
     }
 }
 
+task pingApp() {
+    doFirst {
+        waitUntil(30000) {
+            //TODO: refactor this.
+            def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
+            ping("$url/ping/")
+        }
+    }
+}
+
 def distroPath = "build/distributions/${project.name}-${project.version}.zip"
 
 task extractDistro(type: Copy, dependsOn: 'distZip') {
