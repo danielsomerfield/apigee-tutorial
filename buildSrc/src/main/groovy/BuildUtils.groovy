@@ -1,6 +1,11 @@
+import groovy.transform.Field
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.gradle.api.GradleException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+@Field private static Logger logger = LoggerFactory.getLogger("BuildUtils.groovy")
 
 def static generateVersion() {
     def versionNumber = '1.0.0'
@@ -35,7 +40,8 @@ def static ping(String url) {
 }
 
 def static waitForPing(long timeInMillis) {
-    def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
+    def url = System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
+    logger.info("waiting for $timeInMillis milliseconds until ping to $url returns 200")
     waitUntil(timeInMillis) {
         ping("$url/ping/")
     }
@@ -46,6 +52,3 @@ def static Process startApp(name, version) {
     builder.inheritIO()
     builder.start()
 }
-
-
-

@@ -56,7 +56,7 @@ class HttpUtils {
 
 
     def static pathToURL(String path){
-        String urlRoot = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
+        String urlRoot = System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
         return "$urlRoot$path"
     }
 }
