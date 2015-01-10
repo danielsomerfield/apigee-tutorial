@@ -67,7 +67,7 @@ task cleanup() {
 
 task pingApp() {
     doFirst {
-        def url = "${System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"}/ping/"
+        def url = "${System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"}/ping/"
         logger.info("Starting app ping to url $url")
         waitUntil(1000 * 60) {
             //TODO: refactor this.
