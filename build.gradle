@@ -6,13 +6,13 @@ import org.apache.http.impl.client.BasicCredentialsProvider
 import org.apache.http.impl.client.HttpClients
 
 import static BuildUtils.ping
+import static BuildUtils.generateVersion
 import static BuildUtils.waitUntil
+import static BuildUtils.waitForPing
 
 apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
-
-group = "com.danielsomerfield"
 
 buildscript {
     repositories {
@@ -24,15 +24,12 @@ buildscript {
     }
 }
 
+group = "com.danielsomerfield"
 mainClassName = "helloService.HelloServiceMain"
 sourceCompatibility = 1.8
 version = generateVersion()
 
-def generateVersion() {
-    def versionNumber = '1.0.0'
-    def buildName = System.getenv("CI") == 'true' ? System.getenv("SNAP_PIPELINE_COUNTER") : "DEV"
-    project.version = "$versionNumber-$buildName"
-}
+def distroPath = "build/distributions/${project.name}-${project.version}.zip"
 
 repositories {
     mavenCentral()
@@ -65,18 +62,23 @@ task cleanup() {
     }
 }
 
+task smokeTest(type: Test) {
+    doFirst {
+        waitForPing(60 * 1000)
+    }
+}
+
+
 task pingApp() {
     doFirst {
         def url = "${System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"}/ping/"
         logger.info("Starting app ping to url $url")
         waitUntil(1000 * 60) {
-            //TODO: refactor this.
             ping(url)
         }
     }
 }
 
-def distroPath = "build/distributions/${project.name}-${project.version}.zip"
 
 task extractDistro(type: Copy, dependsOn: 'distZip') {
     from(zipTree(distroPath))
@@ -95,16 +97,6 @@ def startApp() {
     ProcessBuilder builder = new ProcessBuilder("build/exploded/${project.name}-${project.version}/bin/${project.name}")
     builder.inheritIO()
     ext.process = builder.start()
-}
-
-def waitForPing() {
-    def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
-    waitUntil(5000) {
-        if (!ext.process.isAlive()) {
-            throw new GradleException("The server process died with return code ${ext.process.exitValue()}")
-        }
-        ping("$url/ping/")
-    }
 }
 
 task wrapper(type: Wrapper) {

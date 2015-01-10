@@ -2,6 +2,12 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.gradle.api.GradleException
 
+def static generateVersion() {
+    def versionNumber = '1.0.0'
+    def buildName = System.getenv("CI") == 'true' ? System.getenv("SNAP_PIPELINE_COUNTER") : "DEV"
+    "$versionNumber-$buildName"
+}
+
 def static waitUntil(long maxWait, Closure closure) {
     long timeout = System.currentTimeMillis() + maxWait;
 
@@ -27,3 +33,11 @@ def static ping(String url) {
         return false;
     }
 }
+
+def static waitForPing() {
+    def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
+    waitUntil(5000) {
+        ping("$url/ping/")
+    }
+}
+
