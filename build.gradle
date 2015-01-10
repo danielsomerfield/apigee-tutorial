@@ -38,6 +38,7 @@ dependencies {
 
 test {
     exclude '**/*UATest.*'
+    exclude '**/*SmokeTest.*'
 }
 
 task uat(type: Test, dependsOn: ['test', 'extractDistro']) {
@@ -60,6 +61,7 @@ task cleanup() {
 }
 
 task smokeTest(type: Test) {
+    include '**/*SmokeTest.*'
     doFirst {
         waitForPing(60 * 1000)
     }
