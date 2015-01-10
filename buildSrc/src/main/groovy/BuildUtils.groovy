@@ -1,7 +1,6 @@
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.gradle.api.GradleException
-import org.gradle.api.logging.Logger
 
 def static generateVersion() {
     def versionNumber = '1.0.0'
@@ -35,9 +34,9 @@ def static ping(String url) {
     }
 }
 
-def static waitForPing() {
+def static waitForPing(long timeInMillis) {
     def url = System.getProperty("HELLO_SERVICE_ROOT") ?: "http://localhost:8080";
-    waitUntil(5000) {
+    waitUntil(timeInMillis) {
         ping("$url/ping/")
     }
 }
@@ -47,4 +46,6 @@ def static Process startApp(name, version) {
     builder.inheritIO()
     builder.start()
 }
+
+
 

@@ -1,15 +1,7 @@
-import org.apache.http.auth.AuthScope
-import org.apache.http.auth.UsernamePasswordCredentials
-import org.apache.http.client.CredentialsProvider
-import org.apache.http.client.methods.HttpPost
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.apache.http.impl.client.HttpClients
-
-import static BuildUtils.ping
 import static BuildUtils.generateVersion
-import static BuildUtils.waitUntil
 import static BuildUtils.waitForPing
 import static BuildUtils.startApp
+import static PublishUtils.bintrayPublish
 
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -53,7 +45,7 @@ task uat(type: Test, dependsOn: ['test', 'extractDistro']) {
     doFirst {
         logger.info("Starting the app")
         project.ext.process = startApp(project.name, project.version)
-        waitForPing()
+        waitForPing(5000)
     }
 }
 uat.finalizedBy("cleanup")
@@ -72,18 +64,6 @@ task smokeTest(type: Test) {
         waitForPing(60 * 1000)
     }
 }
-
-
-task pingApp() {
-    doFirst {
-        def url = "${System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"}/ping/"
-        logger.info("Starting app ping to url $url")
-        waitUntil(1000 * 60) {
-            ping(url)
-        }
-    }
-}
-
 
 task extractDistro(type: Copy, dependsOn: 'distZip') {
     from(zipTree(distroPath))
@@ -114,24 +94,6 @@ publishing {
 
 publish {
     doLast {
-        def bintrayPublishURL = "https://api.bintray.com/content/danielsomerfield/maven/apigee-tutorial/${version}/publish"
-
-        HttpPost post = new HttpPost(bintrayPublishURL)
-        CredentialsProvider credsProvider = new BasicCredentialsProvider();
-        credsProvider.setCredentials(
-                new AuthScope(null, -1),
-                new UsernamePasswordCredentials(
-                        System.getenv("BINTRAY_USERNAME"),
-                        System.getenv("BINTRAY_PASSWORD")
-                )
-        );
-
-        HttpClients.custom().setDefaultCredentialsProvider(credsProvider).build().withCloseable { client ->
-            client.execute(post).withCloseable() { response ->
-                if (response.statusLine.statusCode != 200) {
-                    throw new GradleException("Bintray publish receive status code ${response.statusLine.statusCode}.")
-                }
-            }
-        }
+        bintrayPublish(version)
     }
 }
