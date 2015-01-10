@@ -1,6 +1,7 @@
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClients
 import org.gradle.api.GradleException
+import org.gradle.api.logging.Logger
 
 def static generateVersion() {
     def versionNumber = '1.0.0'
@@ -39,5 +40,11 @@ def static waitForPing() {
     waitUntil(5000) {
         ping("$url/ping/")
     }
+}
+
+def static Process startApp(name, version) {
+    ProcessBuilder builder = new ProcessBuilder("build/exploded/${name}-${version}/bin/${name}")
+    builder.inheritIO()
+    builder.start()
 }
 

@@ -9,6 +9,7 @@ import static BuildUtils.ping
 import static BuildUtils.generateVersion
 import static BuildUtils.waitUntil
 import static BuildUtils.waitForPing
+import static BuildUtils.startApp
 
 apply plugin: 'groovy'
 apply plugin: 'application'
@@ -50,7 +51,8 @@ test {
 task uat(type: Test, dependsOn: ['test', 'extractDistro']) {
     include '**/*UATest.*'
     doFirst {
-        startApp()
+        logger.info("Starting the app")
+        project.ext.process = startApp(project.name, project.version)
         waitForPing()
     }
 }
@@ -58,7 +60,10 @@ uat.finalizedBy("cleanup")
 
 task cleanup() {
     doFirst {
-        stopApp()
+        if (project.ext.process != null) {
+            logger.info("Killing the app")
+            project.ext.process.destroy()
+        }
     }
 }
 
@@ -83,20 +88,6 @@ task pingApp() {
 task extractDistro(type: Copy, dependsOn: 'distZip') {
     from(zipTree(distroPath))
     into 'build/exploded'
-}
-
-def stopApp() {
-    if (ext.process != null) {
-        logger.info("Killing the app")
-        ext.process.destroy()
-    }
-}
-
-def startApp() {
-    logger.info("Starting the app")
-    ProcessBuilder builder = new ProcessBuilder("build/exploded/${project.name}-${project.version}/bin/${project.name}")
-    builder.inheritIO()
-    ext.process = builder.start()
 }
 
 task wrapper(type: Wrapper) {
