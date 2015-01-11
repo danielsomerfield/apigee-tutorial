@@ -3,10 +3,6 @@ title: Automated Deployment
 layout: tutorial
 tag: setup-snap-ci
 ---
-
-*** IN PROGRESS ***
-
-
 In [the last section](4-setting-up-snap-ci.html), we enhanced our build and created a pipeline in Snap so our tests would run on every commit. Now we move to the next stage and push our code out to the live server. So, I'm going to start with some caveats.
 
 Heroku is great in many ways. It's VERY easy to pull code off your public repo, build it (if it isn't too large) and then have it deployed within minutes. It's free for small test instances, and seems fairly affordable. But, honestly, it doesn't seem to be built for compiled apps or for large continuous delivery deployments for the following reasons:
@@ -83,7 +79,7 @@ publishing {
 
 publish {
   doLast {
-    BintrayPublish(version)
+    bintrayPublish(version)
   }
 }
 
@@ -98,7 +94,7 @@ The new `PublishUtils.groovy` script has the implementation of this publish func
 {% highlight groovy %}
 ...
 def static BintrayPublish(version) {
-  def BintrayPublishURL = "https://api.Bintray.com/content/danielsomerfield/maven/apigee-tutorial/${version}/publish"
+  def bintrayPublishURL = "https://api.Bintray.com/content/danielsomerfield/maven/apigee-tutorial/${version}/publish"
 
   HttpPost post = new HttpPost(BintrayPublishURL)
   CredentialsProvider credsProvider = new BasicCredentialsProvider();
@@ -196,24 +192,48 @@ class HelloServiceSmokeTest {
 In my case, it doesn't have any new tests, but includes the one UA test. If I wanted other tests, I would add test functions here, or else add other classes to the `SuiteClasses` annotation.
 
 Finally, our gradle script is completely configured for CD. But we still need to set up Bintray and Heroku.
+
 ### Setting up the Repository ####
 
-First step is to set up an account on Bintray. I don't love Bintray, particularly because the document is, at best, spotty. If you want to use another repo, including your own, you just need to make sure it can act as a maven repo, or ivy, if you are willing to do some light hacking with this tutorial.
+First step is to set up an account on Bintray. I don't love Bintray, particularly because the document is, at best, spotty. If you want to use another repo, including your own, you just need to make sure it can act as a maven repo, or ivy, if you are willing to do some light hacking with this tutorial. If you don't use Bintray, you can also remove the `bintrayPublish` call or else replace it if the repo you uses requires a similar publish step.
 
 Next you have to manually add a product. I hate manual steps, but this is a one-time-thing. Out of the box, you will have a repo in your account called "maven" for maven repos. You want to add your product here.
 
-TODO: add detail on creating product
-INSERT SCREENSHOT
+1. Log into your account
+2. Click on the "maven" link under "Owned Repositories".
+3. Click on "Add New Package"
+4. Fill out the package details form. The only thing that really matters here is the name. You can call it something other than "apigee-tutorial", but know that if you do, you'll need to change the name of the package in the gradle scripts.
 
-### Setting up Heroku
-Ignoring all the above caveats, deploying this to Heroku is so easy it's almost unfair. The steps are:
+That's it. None of the other stuff really matters. If you look at the docs, it will say you need to add versions, but don't worry about it. Our pipeline will take care of that.
 
-- Create a new heroku app
-- Add a staging target to our gradle
-- Add a
 
-*** IN PROGRESS ***
+### Setting up Heroku ###
+This is a bit of a non-step, insofar as all you have to do is sign up for an account. Snap will do the provisioning of the apps. So, sign up at heroku.com, and then pop over to Snap to set up the connections to Heroku and Bintray.
 
-<!--
+### Setting up Snap ####
+By the end of the last section, we had three build steps: the git hub clone, test, and UAT. Now we're going to add three more.
+
+#### Publish Step ####
+Setting up the publish step, is very similar to setting up the other steps, except we're going to take advantage of the environment variables so we can set credentials.
+
+![Adding Publish to the Snap CI Pipeline](../images/tutorial/snap-pipeline-3.png)
+
+For the username, we can use the `+ Add new` button, and for the password, the `+ Add new secure`. You will notice in the screenshot, I added `--info` to this step. In fact, in the process of debugging, I added it to all my `./gradlew` calls for more useful logs. If you need to debug, you can increase the log level further to `--debug`.
+
+#### Deploy Step ####
+The deploy step works a little differently. When you create the stage, you will want to click the `Deploy` tab and select `Heroku / Basic`. Choose your Heroku credentials at this point and you will be able to choose an application name. If you went off the trail a bit and created one, you can choose it here. Otherwise, select `Create a new app` and call it something that means something to you. You probably won't be able to use "appigee-tutorial" because, well, I have it and the app name is where the host name comes from. The stack should be "cedar", the only supported option at the time of writing this tutorial.
+
+![Adding Deploy to the Snap CI Pipeline](../images/tutorial/snap-pipeline-4.png)
+
+Save the changes, you have your full deployment pipeline in place. Immediately the pipeline will kick off a build and if all went well you will have something in "production". You can test it manually by hitting the end point at "http://*YOUR_APP_NAME*.herokuapp.com/hello/?name=Bob". If you see the JSON response, it worked.
+
+#### Smoke Test Step ####
+The final smoke test step is super simple. Just create one final step named "Smoke" with the following command `./gradlew --info smokeTest`, create the `HELLO_SERVICE_ROOT` environment variable with the value "http://*YOUR_APP_NAME*.herokuapp.com"
+
+![Adding Smoke Test to the Snap CI Pipeline](../images/tutorial/snap-pipeline-5.png)
+
+You're done. Now the tests will run and (hopefully) your pipeline will be green. If something is misconfigured, the pipeline will catch it. If your code is broken, the pipeline will catch it.
+
+Now that we have a stable pipeline, we can start writing more features. Next we'll put an apigee API endpoint in front of our app.
+
 ## [Continue to "Section 6: Apigee Deployment"](6-apigee-deployment.html) ##
--->
