@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TargetEndpoint name="default">
+    <Description>Target for the apigee CD tutorial</Description>
+    <FaultRules/>
+    <Flows/>
+    <HTTPTargetConnection>
+        <Properties/>
+        <URL>https://apigee-tutorial.herokuapp.com/</URL>
+    </HTTPTargetConnection>
+</TargetEndpoint>

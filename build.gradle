@@ -17,16 +17,21 @@ buildscript {
     }
 }
 
-group = "com.danielsomerfield"
+allprojects {
+    group = "com.danielsomerfield"
+    version = generateVersion()
+
+    repositories {
+        mavenCentral()
+    }
+}
+
+
 mainClassName = "helloService.HelloServiceMain"
 sourceCompatibility = 1.8
-version = generateVersion()
 
 def distroPath = "build/distributions/${project.name}-${project.version}.zip"
 
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.+'

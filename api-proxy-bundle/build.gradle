@@ -1,0 +1,13 @@
+apply plugin: "groovy"
+
+task distZip(type:Zip) {
+    from "src/main/config"
+}
+
+task deploy(dependsOn: 'distZip') {
+    doFirst {
+        ApigeeUtils.deployToApigee(version)
+    }
+}
+
+task

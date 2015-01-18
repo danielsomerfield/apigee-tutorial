@@ -1,3 +1,4 @@
 rootProject.name = 'apigee_tutorial'
 
 include 'deploy'
+include 'api-proxy-bundle'
