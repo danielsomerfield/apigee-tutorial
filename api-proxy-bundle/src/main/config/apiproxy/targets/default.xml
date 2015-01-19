@@ -5,6 +5,6 @@
     <Flows/>
     <HTTPTargetConnection>
         <Properties/>
-        <URL>https://apigee-tutorial.herokuapp.com/</URL>
+        <URL>http://apigee-tutorial.herokuapp.com/</URL>
     </HTTPTargetConnection>
 </TargetEndpoint>
