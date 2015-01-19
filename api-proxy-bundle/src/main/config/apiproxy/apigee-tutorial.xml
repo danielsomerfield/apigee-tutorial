@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<APIProxy name="hello">
+<APIProxy name="apigee-tutorial">
     <Description>Apigee Tutorial</Description>
 </APIProxy>
