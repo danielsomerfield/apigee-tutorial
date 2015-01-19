@@ -36,4 +36,4 @@ what you need for this tutorial.*
 The repo for the code is available on [GitHub](https://github.com/danielsomerfield/apigee-tutorial.git).
 Along the way, tags will be listed in case you want to see the code in the state for the current step. At times, a single tag will serve for several tutorial steps.
 
-**[Start the tutorial!](/apigee-tutorial/1-setup-build-scripts.html)**
+**[Start the tutorial!]({{ site.baseurl }}/apigee-tutorial/1-setup-build-scripts.html)**
