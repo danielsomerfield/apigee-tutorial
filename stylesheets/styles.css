@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  padding: 50px 0;
+  padding: 10px 0;
   margin: 0;
   font: 14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #555;
@@ -82,7 +82,7 @@ header.without-description h1 {
 header p {
   margin: 0;
   color: #61778B;
-  width: 300px;
+  width: 275px;
   font-size: 13px;
 }
 header p.view {

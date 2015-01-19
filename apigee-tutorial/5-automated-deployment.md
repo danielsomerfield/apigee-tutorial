@@ -1,7 +1,7 @@
 ---
 title: Automated Deployment
 layout: tutorial
-tag: setup-snap-ci
+tag: automated-deployment
 ---
 In [the last section](4-setting-up-snap-ci.html), we enhanced our build and created a pipeline in Snap so our tests would run on every commit. Now we move to the next stage and push our code out to the live server. So, I'm going to start with some caveats.
 
