@@ -45,7 +45,7 @@ public class HttpBuilder {
         public abstract HttpRequestBase create(URI uri)
     }
 
-    Scheme scheme = System.getenv("SERVICE_SCHEME") == null ? http : Scheme.valueOf(System.getenv("SERVICE_PORT"))
+    Scheme scheme = System.getenv("SERVICE_SCHEME") == null ? http : Scheme.valueOf(System.getenv("SERVICE_SCHEME"))
     String host = System.getenv("SERVICE_HOST") ?: "localhost"
     int port = Integer.parseInt(System.getenv("SERVICE_PORT") ?: "8080")
     String path = "/"
