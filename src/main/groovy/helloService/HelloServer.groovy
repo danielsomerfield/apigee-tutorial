@@ -8,6 +8,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler
 import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.handler.HandlerCollection
 
+import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -24,9 +25,27 @@ class HelloServer {
 
     def HandlerCollection getHandlers() {
         HandlerCollection collection = new HandlerCollection();
-        addHandlerWithContext(collection, "/hello", createHelloHandler())
         addHandlerWithContext(collection, "/ping", createPingHandler());
+        if (sslOnly()) {
+            collection.addHandler(createSSLCheckHandler())
+        }
+        addHandlerWithContext(collection, "/hello", createHelloHandler())
         return collection;
+    }
+
+    static def Handler createSSLCheckHandler() {
+        { final String target, Request baseRequest,
+          final HttpServletRequest request,
+          final HttpServletResponse response ->
+            if (!baseRequest.isHandled() && !"https".equals(request.getHeader("X-Forwarded-Proto"))) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Nice try, wiseguy.")
+                baseRequest.setHandled(true)
+            }
+        } as AbstractHandler
+    }
+
+    static def sslOnly() {
+        System.getenv("HELLO_SERVER_SSL_DISABLED") != "true"
     }
 
     def static addHandlerWithContext(HandlerCollection collection, String context, Handler handler) {

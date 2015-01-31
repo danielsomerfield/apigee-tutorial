@@ -18,3 +18,8 @@ delivery pipeline, with code and configuration living in github (or an equivalen
 There is a [step-by-step walk-through](http://danielsomerfield.github.io/apigee-tutorial/) *(in progress)* of the tutorial on the project website.
 
 I encourage you to fork this project and make pull requests with improvements and corrections.
+
+
+## Suggested Enhancements
+- Use configuration files per env rather than env variables
+- Port non-gradle code to Java
