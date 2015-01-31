@@ -36,6 +36,9 @@ dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.3.+'
     compile 'org.eclipse.jetty:jetty-http:8.1.+'
     compile 'org.eclipse.jetty:jetty-server:8.1.+'
+    compile 'org.slf4j:slf4j-api:1.7.10'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'ch.qos.logback:logback-core:1.1.2'
     testCompile 'org.apache.httpcomponents:httpclient:4.3.+'
     testCompile 'junit:junit:4.+'
 }
