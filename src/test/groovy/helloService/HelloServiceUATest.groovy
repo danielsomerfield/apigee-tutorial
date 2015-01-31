@@ -11,10 +11,10 @@ class HelloServiceUATest {
         serviceClient() {
             path = "/hello/?name=Daniel"
         }.execute().then {
-            assertEquals(200, it.httpStatus)
+            assertEquals(200, it.get().httpStatus)
             assertEquals(
                     "Hello, Daniel!",
-                    it.json.message
+                    it.get().json.message
             )
         }
     }
@@ -24,7 +24,7 @@ class HelloServiceUATest {
         serviceClient() {
             path = "/hello?name=Daniel"
         }.execute().then {
-            assertEquals(302, it.httpStatus)
+            assertEquals(302, it.get().httpStatus)
         }
     }
 }

@@ -26,7 +26,6 @@ allprojects {
     }
 }
 
-
 mainClassName = "helloService.HelloServiceMain"
 sourceCompatibility = 1.8
 
@@ -67,6 +66,13 @@ task cleanup() {
 
 task smokeTest(type: Test) {
     include '**/*SmokeTest.*'
+    doFirst {
+        waitForPing(60 * 1000)
+    }
+}
+
+task securityTest(type:Test) {
+    include '**/*SecurityTest.*'
     doFirst {
         waitForPing(60 * 1000)
     }

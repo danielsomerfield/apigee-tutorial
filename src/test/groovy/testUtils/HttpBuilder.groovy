@@ -66,7 +66,7 @@ public class HttpBuilder {
         new HttpExecution();
     }
 
-    private class Response {
+    public class Response {
 
         private HttpResponse response;
 
@@ -89,9 +89,13 @@ public class HttpBuilder {
         private def exec() {
             HttpClients.custom().setRedirectStrategy(NEVER_REDIRECT_STRATEGY).build().execute(method.create(uri()))
         }
-
         def then(Closure closure) {
-            closure(new Response(exec()))
+            try {
+                closure(Optional.of(new Response(exec())))
+            } catch (Exception e) {
+                e.printStackTrace()
+                closure(Optional.empty())
+            }
         }
     }
 }
