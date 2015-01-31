@@ -50,6 +50,8 @@ class HelloServer {
                 logger.warn("Request denied on non-SSL port.")
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Nice try, wiseguy.")
                 baseRequest.setHandled(true)
+            } else {
+                logger.warn("Request allowed on a non-SSL port. You must be allowing non SSL connections.")
             }
         } as AbstractHandler
     }
