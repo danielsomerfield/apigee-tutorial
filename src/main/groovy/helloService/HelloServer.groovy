@@ -30,6 +30,9 @@ class HelloServer {
         HandlerCollection collection = new HandlerCollection();
         addHandlerWithContext(collection, "/ping", createPingHandler());
         if (sslOnly()) {
+            println("*********************")
+            println("The server is running in SSL-only mode!!!!!!!!!")
+            println("*********************")
             logger.info("The server is running in SSL-only mode.")
             collection.addHandler(createSSLCheckHandler())
         } else {
