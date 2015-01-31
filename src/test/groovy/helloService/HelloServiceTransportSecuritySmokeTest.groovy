@@ -40,7 +40,7 @@ class HelloServiceTransportSecuritySmokeTest {
                 }
 
                 Matcher<? super Integer> isErrorCode() {
-                    return new CustomMatcher<Integer>() {
+                    return new CustomMatcher<Integer>("an HTTP error") {
                         @Override
                         boolean matches(final Object item) {
                             return item instanceof Integer && item > 299
