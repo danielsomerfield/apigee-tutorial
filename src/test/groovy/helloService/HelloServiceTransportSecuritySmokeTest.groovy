@@ -13,7 +13,7 @@ import static testUtils.HttpBuilder.Scheme.http
 import static testUtils.HttpBuilder.Scheme.https
 import static testUtils.HttpBuilder.serviceClient
 
-class HelloServiceTransportSecurityTest {
+class HelloServiceTransportSecuritySmokeTest {
 
     @Test
     public void testServiceIsAvailableViaSSL() {
