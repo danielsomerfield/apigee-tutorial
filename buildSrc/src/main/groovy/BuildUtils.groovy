@@ -26,7 +26,7 @@ def static waitUntil(long maxWait, Closure closure) {
 }
 
 def static pingUrl() {
-    return "${getEnv('SERVICE_SCHEME', 'http')}://${getEnv('SERVICE-HOST', 'localhost')}:${getEnv('SERVICE_PORT', '8080')}/ping"
+    return "${getEnv('SERVICE_SCHEME', 'http')}://${getEnv('SERVICE_HOST', 'localhost')}:${getEnv('SERVICE_PORT', '8080')}/ping"
 }
 
 def static ping() {
