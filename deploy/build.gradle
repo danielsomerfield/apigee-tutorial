@@ -12,6 +12,7 @@ dependencies {
 
 task deploy(type: Copy) {
     configurations.runtime.collect {
+        logger.info("Deploying: " + it)
         from zipTree(it)
     }
 
