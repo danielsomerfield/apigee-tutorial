@@ -1,7 +1,7 @@
 <ProxyEndpoint name="default">
     <HTTPProxyConnection>
         <BasePath>/</BasePath>
-        <VirtualHost>default</VirtualHost>
+        <VirtualHost>secure</VirtualHost>
     </HTTPProxyConnection>
     <RouteRule name="default">
         <TargetEndpoint>default</TargetEndpoint>
