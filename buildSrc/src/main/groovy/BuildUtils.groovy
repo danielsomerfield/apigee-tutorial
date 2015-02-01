@@ -25,9 +25,13 @@ def static waitUntil(long maxWait, Closure closure) {
     throw new GradleException("Wait for expected condition timed out.")
 }
 
-def static ping(String url) {
+def static pingUrl() {
+    return "${getEnv('SERVICE_SCHEME', 'http')}://${getEnv('SERVICE-HOST', 'localhost')}:${getEnv('SERVICE_PORT', '8080')}/ping"
+}
+
+def static ping() {
     try {
-        HttpGet get = new HttpGet(url)
+        HttpGet get = new HttpGet(pingUrl())
         HttpClients.createDefault().withCloseable() { client ->
             client.execute(get).withCloseable() { response ->
                 return response.statusLine.statusCode == 200
@@ -39,11 +43,17 @@ def static ping(String url) {
     }
 }
 
+def static String getEnv(String name, String defaultValue) {
+    def value =  System.getenv(name);
+    return value ?: defaultValue;
+}
+
+
 def static waitForPing(long timeInMillis) {
-    def url = System.getenv("HELLO_SERVICE_ROOT") ?: "http://localhost:8080"
-    logger.info("waiting for $timeInMillis milliseconds until ping to $url returns 200")
+
+    logger.info("waiting for $timeInMillis milliseconds until ping to ${pingUrl()} returns 200")
     waitUntil(timeInMillis) {
-        ping("$url/ping/")
+        ping()
     }
 }
 
