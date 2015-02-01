@@ -19,5 +19,5 @@ task deploy(type: Copy) {
     into {"build/deployment"}
 }
 
-task stage (dependsOn:'deploy') {
+task stage (dependsOn:['clean', 'deploy']) {
 }
