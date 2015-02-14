@@ -7,7 +7,6 @@ delivery pipeline, with code and configuration living in github (or an equivalen
 ## Project goals
 - SSL-only: at no point in the call chain should a request be allowed over non-SSL
 - Service-to-service auth: you should not be able to call the service other than through apigee
-- Authentication: the service will authenticate requests
 - Automation: all configuration must go through github, including apigee endpoint configuration and heroku deployment information.
 
 ## Platform
