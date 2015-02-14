@@ -7,8 +7,7 @@ The goal of this tutorial is to write a basic web service (a hello world variant
 
 ### Project goals
 - SSL-only: at no point in the call chain should a request be allowed over non-SSL
-- Service-to-service auth: you should not be able to call the service other than through apigee
-- Authentication: the service will authenticate requests
+- Service-to-service auth: you should not be able to call the service other than through Apigee
 - Automation: all configuration must go through github, including apigee endpoint configuration and heroku deployment information.
 
 ### Platform
