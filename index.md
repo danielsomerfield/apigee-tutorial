@@ -15,9 +15,13 @@ The goal of this tutorial is to write a basic web service (a hello world variant
 - Service implementation: groovy running under Java 8
 - Server: embedded jetty
 
+### Pipeline / Deployment
+- Delivery Pipeline: Snap
+- Backend Hosting: Heroku
+- API Hosting: Apigee
+
 ### Caveats
-- Because SnapCI doesn't allow you to export or check in pipeline
-info (AFAIK) that will not be part of my source tree
+- Because SnapCI doesn't allow you to export or check in pipeline info (AFAIK) that will not be part of my source tree
 - Private keys should never go in a public repo (arguably, any repo), so I'm not going to check them in. Although this is a challenging problem, I will leave it as a problem for another time. I will provide instructions for generating them. If located in the specified position on the file system, everything should just work.
 
 ### Assumptions
